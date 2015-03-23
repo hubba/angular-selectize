@@ -60,9 +60,8 @@ angular.module('selectize', []).value('selectizeConfig', {}).directive("selectiz
         }
       }
 
-
-      var onOptionAdd = config.onOptionAdd;
-      // var onChange = config.onChange;
+      var onChange = config.onChange,
+      onOptionAdd = config.onOptionAdd;
 
       // Old Version - ** wasn't working so we replaced it with below
       // config.onChange = function(){
