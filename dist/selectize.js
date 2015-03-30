@@ -55,8 +55,8 @@ angular.module('selectize', []).value('selectizeConfig', {}).directive("selectiz
         selectize.$control.toggleClass('ng-pristine', modelCtrl.$pristine)
 
         if( !angular.equals(selectize.items, scope.ngModel) ){
-          selectize.addOption(generateOptions(scope.ngModel))
-          selectize.setValue(scope.ngModel)
+          selectize.addOption(generateOptions(scope.ngModel));
+          selectize.setValue(scope.ngModel);
         }
       }
 
@@ -95,9 +95,10 @@ angular.module('selectize', []).value('selectizeConfig', {}).directive("selectiz
       }
 
       config.onOptionAdd = function(value, data) {
-        if( scope.options.indexOf(data) === -1 )
-          scope.options.push(data);
 
+        if( scope.options.indexOf(data) === -1 ) {
+          scope.options.push(data);
+        }
         if (onOptionAdd) {
           onOptionAdd.apply(this, arguments);
         }
@@ -105,15 +106,19 @@ angular.module('selectize', []).value('selectizeConfig', {}).directive("selectiz
 
       // ngModel (ie selected items) is included in this because if no options are specified, we
       // need to create the corresponding options for the items to be visible
-      // ** was causing problems, so we had to comment this out.
-      // scope.options = generateOptions( (scope.options || config.options || scope.ngModel).slice() );
+      // *** Old *** scope.options =  generateOptions( (scope.options || config.options || scope.ngModel).slice() );
+      scope.generatedOptions = generateOptions( (scope.options || config.options || scope.ngModel).slice() );
+      scope.options.length = 0;
+      scope.generatedOptions.forEach(function (item) {
+        scope.options.push(item);
+      });
 
       var angularCallback = config.onInitialize;
 
       config.onInitialize = function(){
         selectize = element[0].selectize;
-        selectize.addOption(scope.options)
-        selectize.setValue(scope.ngModel)
+        selectize.addOption(scope.generatedOptions); 
+        selectize.setValue(scope.ngModel);
 
         //provides a way to access the selectize element from an
         //angular controller
@@ -122,8 +127,13 @@ angular.module('selectize', []).value('selectizeConfig', {}).directive("selectiz
         }
 
         scope.$watch('options', function(){
+          scope.generatedOptions = generateOptions( (scope.options || config.options || scope.ngModel).slice() );
+          scope.options.length = 0;
+          scope.generatedOptions.forEach(function (item) {
+            scope.options.push(item);
+          });
           selectize.clearOptions();
-          selectize.addOption(scope.options)
+          selectize.addOption(scope.generatedOptions);
           selectize.setValue(scope.ngModel)
         }, true);
 
